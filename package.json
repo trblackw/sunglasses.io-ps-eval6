@@ -1,0 +1,29 @@
+{
+  "name": "sunglasses.io-ps-eval6",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trblackw/sunglasses.io-ps-eval6.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "finalhandler": "latest",
+    "http": "latest",
+    "querystring": "^0.2.0",
+    "rand-token": "^0.4.0",
+    "router": "^1.3.2"
+  },
+  "bugs": {
+    "url": "https://github.com/trblackw/sunglasses.io-ps-eval6/issues"
+  },
+  "homepage": "https://github.com/trblackw/sunglasses.io-ps-eval6#readme"
+}
