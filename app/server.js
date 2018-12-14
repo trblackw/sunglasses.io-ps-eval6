@@ -4,7 +4,6 @@ const finalHandler = require("finalhandler");
 const queryString = require("querystring");
 const Router = require("router");
 const bodyParser = require("body-parser");
-const serveStatic = require("serve-static");
 const uid = require("rand-token").uid;
 const url = require("url");
 const { findObject } = require("./utils");
@@ -63,17 +62,17 @@ router.use(bodyParser.json());
 const server = http
   .createServer((req, res) => {
     if (req.method === "OPTIONS") {
-      response.writeHead(200, CORS_HEADERS);
-      response.end();
+      res.writeHead(200, CORS_HEADERS);
+      res.end();
     }
     //  res.writeHead(200, { ...CORS_HEADERS, "Content-Type": "application/json" });
     if (!API_KEYS.includes(req.headers["x-authentication"])) {
-      response.writeHead(
+      res.writeHead(
         401,
         "You need to have a valid API key to use this API",
         CORS_HEADERS
       );
-      response.end();
+      res.end();
     }
     router(req, res, finalHandler(req, res));
   })
@@ -90,11 +89,21 @@ const server = http
       if (err) throw err;
       products = JSON.parse(data);
     });
+    //populate users
+    fs.readFile("initial-data/users.json", "utf-8", (err, data) => {
+      if (err) throw err;
+      users = JSON.parse(data);
+      user = users[0];
+    });
   });
+
+// username: yellowleopard753;
+// password: jonjon;
 
 //POST /api/login (login user)
 router.post("/api/login", (req, res) => {
-  const { username, password } = req.body;
+  //   const { username, password } = req.body;
+  const { username, password } = user;
   if (username && password && getUserFailedLogin[username] < 3) {
     const user = users.find(({ login }) => {
       login.username === username && login.password === password;

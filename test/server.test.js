@@ -4,6 +4,7 @@ const server = require("../app/server");
 const expect = chai.expect;
 
 chai.use(chaiHTTP);
+
 //GET BRANDS
 describe("/GET brands", () => {
   it.only("should GET all brands", done => {
