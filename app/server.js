@@ -66,14 +66,14 @@ const server = http
       res.end();
     }
     //  res.writeHead(200, { ...CORS_HEADERS, "Content-Type": "application/json" });
-    if (!API_KEYS.includes(req.headers["x-authentication"])) {
-      res.writeHead(
-        401,
-        "You need to have a valid API key to use this API",
-        CORS_HEADERS
-      );
-      res.end();
-    }
+   //  if (!API_KEYS.includes(req.headers["x-authentication"])) {
+   //    res.writeHead(
+   //      401,
+   //      "You need to have a valid API key to use this API",
+   //      CORS_HEADERS
+   //    );
+   //    res.end();
+   //  }
     router(req, res, finalHandler(req, res));
   })
   .listen(PORT, err => {
