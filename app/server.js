@@ -8,10 +8,6 @@ const uid = require("rand-token").uid;
 const url = require("url");
 const { findObject } = require("./utils");
 
-const API_KEYS = [
-  "88312679-04c9-4351-85ce-3ed75293b449",
-  "1a5c45d3-8ce7-44da-9e78-02fb3c1a71b7"
-];
 const TOKEN_VALIDITY_TIMEOUT = 15 * 60 * 1000; // 15 minutes
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -61,19 +57,6 @@ router.use(bodyParser.json());
 
 const server = http
   .createServer((req, res) => {
-    if (req.method === "OPTIONS") {
-      res.writeHead(200, CORS_HEADERS);
-      res.end();
-    }
-    //  res.writeHead(200, { ...CORS_HEADERS, "Content-Type": "application/json" });
-   //  if (!API_KEYS.includes(req.headers["x-authentication"])) {
-   //    res.writeHead(
-   //      401,
-   //      "You need to have a valid API key to use this API",
-   //      CORS_HEADERS
-   //    );
-   //    res.end();
-   //  }
     router(req, res, finalHandler(req, res));
   })
   .listen(PORT, err => {
@@ -143,12 +126,25 @@ router.post("/api/login", (req, res) => {
 
 //GET /api/brands (all brands) -- PUBLIC
 router.get("/api/brands", (req, res) => {
+  const parsedUrl = url.parse(req.originalUrl);
+  const { query } = queryString.parse(parsedUrl.query);
   if (!brands) {
     res.writeHead(404, "There aren't any brands");
     return res.end();
   }
+  let brandsToReturn = [];
+  if (query !== undefined) {
+    brandsToReturn = brands.filter(brand => brand.name.includes(query));
+    if (!brandsToReturn) {
+      res.writeHead(404, "That brand does not exist");
+      return res.end();
+    }
+  } else {
+    brandsToReturn = brands;
+  }
+
   res.writeHead(200, { ...CORS_HEADERS, "Content-Type": "application/json" });
-  res.end(JSON.stringify(brands));
+  res.end(JSON.stringify(brandsToReturn));
 });
 
 //GET /api/products/:id (specific product)
@@ -167,12 +163,27 @@ router.get("/api/products/:id", (req, res) => {
 
 //GET /api/products (all products)
 router.get("/api/products", (req, res) => {
+  const parsedUrl = url.parse(req.originalUrl);
+  const { query } = queryString.parse(parsedUrl.query);
   if (!products) {
     res.writeHead(404, "There aren't any products to display");
     res.end();
   }
+  let productsToReturn = [];
+  if (query !== undefined) {
+    productsToReturn = products.filter(
+      product =>
+        product.name.includes(query) || product.description.includes(query)
+    );
+    if (!productsToReturn) {
+      res.writeHead(404, "That product does not exist");
+      return res.end();
+    }
+  } else {
+    productsToReturn = products;
+  }
   res.writeHead(200, { "Content-Type": "application/json" });
-  res.end(JSON.stringify(products));
+  res.end(JSON.stringify(productsToReturn));
 });
 
 //GET /api/brands/:id/products (specific category/brand of product)
