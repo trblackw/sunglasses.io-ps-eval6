@@ -153,3 +153,18 @@ describe("/GET specific category of product", () => {
       });
   });
 });
+
+describe("/POST login user", () => {
+  it.only("should login the user", done => {
+    chai
+      .request(server)
+      .post("/api/login")
+      .end((err, res) => {
+        assert.isNull(err);
+        expect(res).to.have.status(200);
+        expect(res.body).to.be.lengthOf(16);
+        expect(res.body).to.be.a("string");
+        done();
+      });
+  });
+});
