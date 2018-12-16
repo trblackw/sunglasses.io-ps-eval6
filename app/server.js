@@ -27,14 +27,14 @@ let accessTokens = [];
 let failedLoginAttempts = {};
 
 //helper functions
-const getUserFailedLogin = username => {
-  const failedReq = failedLoginAttempts[username];
-  return failedReq ? failedReq : 0;
-};
+// const getUserFailedLogin = username => {
+//   const failedReq = failedLoginAttempts[username];
+//   return failedReq ? failedReq : 0;
+// };
 
-const setUserFailedLogin = (username, numFails) => {
-  failedLoginAttempts[username] = numFails;
-};
+// const setUserFailedLogin = (username, numFails) => {
+//   failedLoginAttempts[username] = numFails;
+// };
 //process access token
 const getValidTokenFromReq = req => {
   const parsedUrl = url.parse(req.url, true);
@@ -86,42 +86,33 @@ const server = http
 //POST /api/login (login user)
 router.post("/api/login", (req, res) => {
   //   const { username, password } = req.body;
-  const { username, password } = user;
-  if (username && password && getUserFailedLogin[username] < 3) {
-    const user = users.find(({ login }) => {
-      login.username === username && login.password === password;
-    });
-    if (!user) {
-      const loginAttempts = getUserFailedLogin(username);
-      setUserFailedLogin(username, loginAttempts++);
-      res.writeHead(401, "Invalid username or password");
-      res.end();
-    }
-    //if user found, reset attempts
-    setUserFailedLogin(username, 0);
-    res.writeHead(200, { ...CORS_HEADERS, "Content-Type": "application/json" });
-
-    //check for existing token
-    const currentToken = accessTokens.find(({ username }) => {
-      username === user.login.username;
-    });
-
-    if (currentToken) {
-      currentToken.lastUpdated = new Date();
-      res.end(JSON.stringify(currentToken.token));
-    } else {
-      const newToken = {
-        username: user.login.username,
-        lastUpdated: new Date(),
-        token: uid(16)
-      };
-      accessTokens.push(newToken);
-      res.end(JSON.stringify(newToken.token));
-    }
-  } else {
-    res.writeHead(400, "Incorrectly formatted response");
+  const { username, password } = user.login;
+  if (!username || !password) {
+    res.writeHead(401, "Invalid username or password");
     res.end();
   }
+  res.writeHead(200, { ...CORS_HEADERS, "Content-Type": "application/json" });
+
+  //check for existing token
+  const currentToken = accessTokens.find(({ username }) => {
+    username === user.login.username;
+  });
+
+  if (currentToken) {
+    currentToken.lastUpdated = new Date();
+    res.end(JSON.stringify(currentToken.token));
+  } else {
+    const newToken = {
+      username,
+      lastUpdated: new Date(),
+      token: uid(16)
+    };
+    accessTokens.push(newToken);
+    return res.end(JSON.stringify(newToken.token));
+  }
+
+  res.writeHead(400, "Incorrectly formatted response");
+  res.end();
 });
 
 //GET /api/brands (all brands) -- PUBLIC
